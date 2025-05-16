@@ -1,0 +1,179 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/guides.css' %}">
+{% endblock %}
+
+{% block title %}Qo'llanmalar{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h1 class="text-center mb-4">Qo'llanmalar</h1>
+    <div class="row">
+        {% for guide in guides %}
+            <div class="col-md-6 mb-4">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ guide.title }}</h5>
+                        <p class="card-text">{{ guide.content|truncatewords:30 }}</p>
+                        <a href="{% url 'guide_detail' guide.pk%}" class="btn btn-outline-primary">Batafsil</a>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-12">
+                <p class="text-center">Hozircha qo'llanmalar yo'q.</p>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+<style>
+    /* Qo'llanmalar Page Styling */
+
+/* Page Title */
+h1.text-center.mb-4 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-top: 2rem;
+    margin-bottom: 2rem !important;
+    position: relative;
+    padding-bottom: 15px;
+}
+
+h1.text-center.mb-4:after {
+    content: '';
+    position: absolute;
+    width: 100px;
+    height: 3px;
+    background-color: #3498db;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+/* Cards Styling */
+.card {
+    border: none;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    height: 100%;
+    overflow: hidden;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+.card-title {
+    color: #2c3e50;
+    font-weight: 600;
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+}
+
+.card-text {
+    color: #7f8c8d;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+}
+
+/* Button Styling */
+.btn-outline-primary {
+    border-color: #3498db;
+    color: #3498db;
+    border-radius: 5px;
+    padding: 0.5rem 1.5rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-outline-primary:hover {
+    background-color: #3498db;
+    color: white;
+    box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+}
+
+/* Empty State */
+p.text-center {
+    color: #7f8c8d;
+    font-size: 1.1rem;
+    margin: 3rem 0;
+    font-style: italic;
+}
+
+/* Row Spacing */
+.row {
+    margin-bottom: 2rem;
+}
+
+/* Card Hover Effect */
+.card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(to right, #3498db, #2980b9);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s ease;
+}
+
+.card:hover::before {
+    transform: scaleX(1);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    h1.text-center.mb-4 {
+        font-size: 2rem;
+    }
+    
+    .card-body {
+        padding: 1.25rem;
+    }
+}
+
+/* Animation for cards on page load */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.col-md-6 {
+    animation: fadeInUp 0.5s ease forwards;
+    opacity: 0;
+}
+
+.col-md-6:nth-child(2) {
+    animation-delay: 0.1s;
+}
+
+.col-md-6:nth-child(3) {
+    animation-delay: 0.2s;
+}
+
+.col-md-6:nth-child(4) {
+    animation-delay: 0.3s;
+}
+
+.col-md-6:nth-child(n+5) {
+    animation-delay: 0.4s;
+}
+</style>
+{% endblock %}

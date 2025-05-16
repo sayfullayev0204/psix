@@ -1,0 +1,378 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/psychological_tests.css' %}">
+{% endblock %}
+
+{% block title %}Psixologik testlar{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h1 class="text-center mb-4">Psixologik testlar</h1>
+    
+    <div class="progress-container">
+        <div class="progress">
+            <div class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+        </div>
+        <p class="text-end mt-2 text-muted small">
+            <span id="answered-count">0</span> / <span id="total-questions">{{ tests|length }}</span> savollar javob berildi
+        </p>
+    </div>
+    
+    <form method="post" class="bg-light p-4 rounded shadow-sm" id="psychological-test-form">
+        {% csrf_token %}
+        {% for test in tests %}
+            <div class="mb-3" id="question-{{ test.id }}">
+                <p class="fw-bold">{{ test.question }} <span class="required-indicator">*</span></p>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="test_{{ test.id }}" value="option1" id="test_{{ test.id }}_1" required>
+                    <label class="form-check-label" for="test_{{ test.id }}_1">{{ test.option1 }}</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="test_{{ test.id }}" value="option2" id="test_{{ test.id }}_2">
+                    <label class="form-check-label" for="test_{{ test.id }}_2">{{ test.option2 }}</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="test_{{ test.id }}" value="option3" id="test_{{ test.id }}_3">
+                    <label class="form-check-label" for="test_{{ test.id }}_3">{{ test.option3 }}</label>
+                </div>
+                <div class="validation-message">Iltimos, javobni tanlang</div>
+            </div>
+        {% endfor %}
+        <button type="submit" class="btn btn-success w-100">Natijani ko'rish</button>
+    </form>
+</div>
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('psychological-test-form');
+        const progressBar = document.querySelector('.progress-bar');
+        const answeredCount = document.getElementById('answered-count');
+        const totalQuestions = document.getElementById('total-questions');
+        const radioInputs = document.querySelectorAll('.form-check-input');
+        
+        // Update progress when a radio button is clicked
+        function updateProgress() {
+            const totalQuestions = document.querySelectorAll('.mb-3').length;
+            const answeredQuestions = document.querySelectorAll('.form-check-input:checked').length;
+            
+            const progressPercentage = (answeredQuestions / totalQuestions) * 100;
+            progressBar.style.width = progressPercentage + '%';
+            progressBar.setAttribute('aria-valuenow', progressPercentage);
+            
+            answeredCount.textContent = answeredQuestions;
+        }
+        
+        // Highlight selected option
+        radioInputs.forEach(input => {
+            input.addEventListener('change', function() {
+                // Remove selected class from all options in this question group
+                const questionDiv = this.closest('.mb-3');
+                questionDiv.querySelectorAll('.form-check').forEach(check => {
+                    check.classList.remove('selected');
+                });
+                
+                // Add selected class to the chosen option
+                this.closest('.form-check').classList.add('selected');
+                
+                // Update progress
+                updateProgress();
+            });
+        });
+        
+        // Form validation
+        form.addEventListener('submit', function(e) {
+            let isValid = true;
+            const questions = document.querySelectorAll('.mb-3');
+            
+            questions.forEach(question => {
+                const radios = question.querySelectorAll('input[type="radio"]');
+                const isAnswered = Array.from(radios).some(radio => radio.checked);
+                
+                if (!isAnswered) {
+                    isValid = false;
+                    question.classList.add('is-invalid');
+                    question.querySelector('.validation-message').classList.add('show');
+                    
+                    // Scroll to the first unanswered question
+                    if (isValid === false) {
+                        question.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        isValid = null; // Prevent scrolling to other questions
+                    }
+                } else {
+                    question.classList.remove('is-invalid');
+                    question.querySelector('.validation-message').classList.remove('show');
+                }
+            });
+            
+            if (!isValid) {
+                e.preventDefault();
+            }
+        });
+        
+        // Initialize progress
+        updateProgress();
+    });
+</script>
+<style>
+    /* Psychological Tests Page Styling */
+
+/* Page Title */
+h1.text-center.mb-4 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-top: 2rem;
+    margin-bottom: 2rem !important;
+    position: relative;
+    padding-bottom: 15px;
+}
+
+h1.text-center.mb-4:after {
+    content: '';
+    position: absolute;
+    width: 100px;
+    height: 3px;
+    background-color: #3498db;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+/* Form Container */
+form.bg-light {
+    background-color: #ffffff !important;
+    border-radius: 12px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05) !important;
+    padding: 2rem !important;
+    max-width: 800px;
+    margin: 0 auto 3rem;
+    border: 1px solid #f0f0f0;
+}
+
+/* Question Styling */
+.mb-3 {
+    margin-bottom: 2rem !important;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid #f0f0f0;
+    animation: fadeIn 0.5s ease forwards;
+}
+
+.mb-3:last-of-type {
+    border-bottom: none;
+    padding-bottom: 1rem;
+}
+
+/* Question Text */
+p.fw-bold {
+    font-size: 1.2rem;
+    color: #2c3e50;
+    margin-bottom: 1.2rem;
+    font-weight: 600 !important;
+    line-height: 1.5;
+    position: relative;
+    padding-left: 1.8rem;
+}
+
+/* Question Number */
+p.fw-bold:before {
+    content: attr(data-question);
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 1.5rem;
+    height: 1.5rem;
+    background-color: #3498db;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+/* Add question numbers using JavaScript */
+.mb-3 {
+    counter-increment: question-counter;
+}
+
+p.fw-bold:before {
+    content: counter(question-counter);
+}
+
+form {
+    counter-reset: question-counter;
+}
+
+/* Answer Options Styling */
+.form-check {
+    margin-bottom: 0.8rem;
+    padding-left: 2rem;
+    transition: all 0.2s ease;
+    border-radius: 8px;
+    padding: 0.8rem 1rem 0.8rem 2.5rem;
+}
+
+.form-check:hover {
+    background-color: #f8f9fa;
+}
+
+/* Custom Radio Button Styling */
+.form-check-input {
+    width: 1.2rem;
+    height: 1.2rem;
+    margin-top: 0.2rem;
+    margin-left: -1.5rem;
+    cursor: pointer;
+    border: 2px solid #cbd5e0;
+}
+
+.form-check-input:checked {
+    background-color: #3498db;
+    border-color: #3498db;
+}
+
+.form-check-input:focus {
+    box-shadow: 0 0 0 0.25rem rgba(52, 152, 219, 0.25);
+    border-color: #3498db;
+}
+
+/* Label Styling */
+.form-check-label {
+    font-size: 1.05rem;
+    color: #4a5568;
+    cursor: pointer;
+    padding-left: 0.3rem;
+    transition: color 0.2s ease;
+}
+
+.form-check-input:checked + .form-check-label {
+    color: #2c3e50;
+    font-weight: 500;
+}
+
+/* Submit Button Styling */
+.btn-success {
+    background-color: #2ecc71;
+    border-color: #2ecc71;
+    font-size: 1.1rem;
+    font-weight: 600;
+    padding: 0.8rem 1.5rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    margin-top: 1.5rem;
+    box-shadow: 0 4px 6px rgba(46, 204, 113, 0.2);
+}
+
+.btn-success:hover {
+    background-color: #27ae60;
+    border-color: #27ae60;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(46, 204, 113, 0.3);
+}
+
+.btn-success:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(46, 204, 113, 0.2);
+}
+
+/* Progress Indicator */
+.progress-container {
+    max-width: 800px;
+    margin: 0 auto 2rem;
+}
+
+.progress {
+    height: 0.6rem;
+    border-radius: 1rem;
+    background-color: #e2e8f0;
+    overflow: hidden;
+}
+
+.progress-bar {
+    background-color: #3498db;
+    transition: width 0.3s ease;
+}
+
+/* Animation for questions */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.mb-3:nth-child(1) { animation-delay: 0.1s; }
+.mb-3:nth-child(2) { animation-delay: 0.2s; }
+.mb-3:nth-child(3) { animation-delay: 0.3s; }
+.mb-3:nth-child(4) { animation-delay: 0.4s; }
+.mb-3:nth-child(5) { animation-delay: 0.5s; }
+.mb-3:nth-child(n+6) { animation-delay: 0.6s; }
+
+/* Selected option highlight */
+.form-check.selected {
+    background-color: #ebf8ff;
+    border-left: 3px solid #3498db;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    h1.text-center.mb-4 {
+        font-size: 2rem;
+    }
+    
+    form.bg-light {
+        padding: 1.5rem !important;
+    }
+    
+    p.fw-bold {
+        font-size: 1.1rem;
+    }
+    
+    .form-check-label {
+        font-size: 1rem;
+    }
+    
+    .btn-success {
+        font-size: 1rem;
+        padding: 0.7rem 1.2rem;
+    }
+}
+
+/* Required question indicator */
+.required-indicator {
+    color: #e74c3c;
+    margin-left: 0.3rem;
+}
+
+/* Form validation styling */
+.form-check.is-invalid {
+    animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-5px); }
+    40%, 80% { transform: translateX(5px); }
+}
+
+.validation-message {
+    color: #e74c3c;
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+    display: none;
+}
+
+.validation-message.show {
+    display: block;
+}
+</style>
+{% endblock %}
+{% endblock %}

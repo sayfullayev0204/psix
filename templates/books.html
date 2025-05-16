@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% block title %}Kitoblar{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <div class="container py-5" style="margin-top: 150px; height: 300px;">
+        <h1 class="text-center mb-5 text-primary fw-bold">Kitoblar</h1>
+        <div class="row">
+            {% for book in books %}
+                <div class="col-md-4 mb-4" >
+                    <div class="card shadow-sm border-0 rounded-3 hover-card">
+                        <div class="card-body text-center" style="margin: 20px; padding: 20px;">
+                            <h5 class="card-title text-dark fw-semibold">{{ book.title }}</h5>
+                            <a href="{{book.file.url}}" class="btn btn-primary"><i class="fas fa-file"></i> Yuklab olish</a>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-12">
+                    <p class="text-center text-muted fs-5">Hozircha kitoblar yo‘q.</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Arial', sans-serif;
+        }
+        .text-primary {
+            color: #007bff !important;
+        }
+        .card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            background-color: #fff;
+        }
+        .hover-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1) !important;
+        }
+        .card-title {
+            font-size: 1.25rem;
+            margin-bottom: 15px;
+        }
+        audio {
+            border-radius: 20px;
+            outline: none;
+        }
+        audio::-webkit-media-controls-panel {
+            background-color: #e9ecef;
+            border-radius: 20px;
+        }
+        .container {
+            max-width: 1200px;
+        }
+        .shadow-sm {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+        }
+        .rounded-3 {
+            border-radius: 15px !important;
+        }
+        .text-muted {
+            color: #6c757d !important;
+        }
+    </style>
+{% endblock %}
