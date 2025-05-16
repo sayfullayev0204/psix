@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-3*94+jh7kb04^g%5$36=n^2wxm7gc$04h3&oi2m3oiteay9&jh
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['phoenix-rapid-factually.ngrok-free.app',"127.0.0.1","psix.onrender.com/"]
+ALLOWED_HOSTS = ['phoenix-rapid-factually.ngrok-free.app',"127.0.0.1","psix.onrender.com"]
 CSRF_TRUSTED_ORIGINS = [
     "http://127.0.0.1:8000",
     "http://localhost:8000",
